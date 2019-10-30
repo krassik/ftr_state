@@ -1,7 +1,8 @@
-import 'package:bloc/counter_bloc.dart';
-import 'package:bloc/counter_event.dart';
+import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:provider/provider.dart';
+import 'package:bloc/counter.dart';
 
 void main() => runApp(MyApp());
 
@@ -13,71 +14,56 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: MyHomePage(title: 'Flutter Demo Home Page'),
+      home: ChangeNotifierProvider<Counter>(
+          builder: (context) => Counter(),
+          child: MyHomePage(title: 'Flutter Demo Home Page')),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
+class MyHomePage extends StatelessWidget {
   MyHomePage({Key key, this.title}) : super(key: key);
 
   final String title;
 
   @override
-  _MyHomePageState createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  final _bloc = CounterBloc();
-
-  @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-      ),
-      body: Center(
-        child: StreamBuilder(
-          stream: _bloc.counter,
-          initialData: 0,
-          builder: (BuildContext context, AsyncSnapshot<int> snapshot) {
-            return Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                Text(
-                  'You have pushed the button this many times:',
-                ),
-                Text(
-                  '${ snapshot.data }',
-                  style: Theme.of(context).textTheme.display1,
-                ),
-              ],
-            );
-          },
-        ),
-      ),
-      floatingActionButton: Row(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: <Widget>[
-          FloatingActionButton(
-            onPressed: () => _bloc.counterEventSink.add(IncrementEvent()),
-            tooltip: 'Increment',
-            child: Icon(Icons.add),
-          ),
-          SizedBox(width: 10),
-          FloatingActionButton(
-            onPressed: () => _bloc.counterEventSink.add(DecrementEvent()),
-            tooltip: 'Decrement',
-            child: Icon(Icons.remove),
-          ),
-        ],
-      ),
-    );
-  }
+    final counter = Provider.of<Counter>(context, listen: false);
 
-  @override
-  void dispose() {
-    super.dispose();
-    _bloc.dispose();
+    return Scaffold(
+        appBar: AppBar(
+          title: Text(title),
+        ),
+        body: Center(
+            child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Text(
+              'You have pushed the button this many times:',
+            ),
+            Consumer<Counter>(
+                    builder: (_, conuter, __) => Text(
+                '${counter.value}',
+                style: Theme.of(context).textTheme.display1,
+              ),
+            ),
+          ],
+        )),
+        floatingActionButton: Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: <Widget>[
+            FloatingActionButton(
+              onPressed: counter.increment,
+              tooltip: 'Increment',
+              child: Icon(Icons.add),
+            ),
+            SizedBox(width: 10),
+            FloatingActionButton(
+              onPressed: counter.decrement,
+              tooltip: 'Decrement',
+              child: Icon(Icons.remove),
+            ),
+          ],
+        ));
   }
 }
