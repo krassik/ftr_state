@@ -1,4 +1,4 @@
-import 'package:flutter/foundation.dart';
+/*import 'package:flutter/foundation.dart';
 
 class Counter with ChangeNotifier {
   int value = 0;
@@ -12,4 +12,4 @@ class Counter with ChangeNotifier {
     value--;
     notifyListeners();
   }
-}
+}*/
